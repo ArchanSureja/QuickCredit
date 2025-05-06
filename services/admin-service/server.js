@@ -16,6 +16,7 @@ app.use(express.json());
 app.use('/api/admin', require('./routes/admin-routes'));
 app.use('/api/loan-products', require('./routes/loanProductRoutes'));
 app.use('/api/loan-applications', require('./routes/loanApplicationRoutes'));
+app.use('/api/lender-params', require('./routes/lenderParamsRoutes'));
 
 const PORT = process.env.PORT || 5000;
 
