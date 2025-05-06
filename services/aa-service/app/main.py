@@ -23,8 +23,9 @@ SETU_PRODUCT_ID = os.getenv("SETU_PRODUCT_ID")
 class PhoneInput(BaseModel):
     phone: str
 
-@app.post("/init-consent")
-async def init_consent(data : PhoneInput):
+# create consent endpoint 
+@app.post("/create-consent")
+async def create_consent(data : PhoneInput):
    phone = data.phone
    async with httpx.AsyncClient() as client:
        # Step 1 : Get Auth Token 
@@ -82,8 +83,8 @@ async def init_consent(data : PhoneInput):
         }
         return JSONResponse(content=res)
 
-@app.get("/fetch-data/{consent_id}")
-async def fetch_data(consent_id : str):
+@app.get("/get-consent-status/{consent_id}")
+async def get_consent_status(consent_id : str):
     async with httpx.AsyncClient() as client:
         with open("token.json","r") as f:
             token = json.load(f)
@@ -95,10 +96,14 @@ async def fetch_data(consent_id : str):
             }
         )
         consent_check_obj = json.loads(consent_check_res.text)
-        print(consent_check_res.text)
-        print(consent_check_obj)
-      
-            # create new data session 
+        return JSONResponse(content=consent_check_obj)
+    
+@app.get("/create-session/{consent_id}")
+async def fetch_data(consent_id : str):
+    async with httpx.AsyncClient() as client:
+        with open("token.json","r") as f:
+            token = json.load(f)
+        # create new data session 
         now = datetime.now(timezone.utc) - timedelta(days=1)
         one_year_ago = now - timedelta(days=300)
         from_timestamp = one_year_ago.isoformat(timespec='seconds').replace('+00:00', 'Z')
@@ -120,9 +125,14 @@ async def fetch_data(consent_id : str):
                 json=session_create_payload
             )
         session_create_obj = json.loads(session_create_res.text)
-        session_id = session_create_obj.get("id")
-        print(session_create_obj)
-        print(session_id)
+        return JSONResponse(content=session_create_obj)
+
+
+@app.get("/fetch-data/{session_id}")
+async def fetch_data(session_id :str):
+    async with httpx.AsyncClient() as client:
+        with open("token.json","r") as f:
+            token = json.load(f)
         # fetch data using the session id 
         FI_data_res =await client.get(
                 f"{SETU_BASE_URL}/sessions/{session_id}",
