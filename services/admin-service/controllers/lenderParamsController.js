@@ -1,4 +1,4 @@
-const LenderParamsAndProduct = require('../models/LenderParamsAndProduct');
+const LenderParamsAndProduct = require('../models/LenderParamsAndProductSchema');
 
 // Create lender parameters
 exports.createLenderParams = async (req, res) => {
