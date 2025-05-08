@@ -11,16 +11,17 @@ import NotFound from "./pages/NotFound";
 // Admin imports
 import AdminLayout from "./components/admin/AdminLayout";
 import AdminDashboard from "./pages/admin/AdminDashboard";
-import Applications from "./pages/admin/Applications";
+import Applications from "./pages/admin/Application/Applications";
 import LoanCriteria from "./pages/admin/LoanCriteria";
 import Analytics from "./pages/admin/Analytics";
+import LoanProduct from "./pages/admin/LoanProduct";
 
 const queryClient = new QueryClient();
 
 // Auth check component for protected routes
 const RequireAuth = ({ children }: { children: JSX.Element }) => {
   const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-  
+
   if (!isLoggedIn) {
     return <Navigate to="/login" replace />;
   }
@@ -31,7 +32,7 @@ const RequireAuth = ({ children }: { children: JSX.Element }) => {
 const App = () => {
   // Initialize auth state from localStorage
   const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
-  
+
   useEffect(() => {
     // Check login status on mount
     const loggedIn = localStorage.getItem('isLoggedIn') === 'true';
@@ -42,7 +43,7 @@ const App = () => {
   if (isLoggedIn === null) {
     return null; // Or a loading spinner
   }
-  
+
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
@@ -53,49 +54,58 @@ const App = () => {
             {/* Public routes */}
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<Login />} />
-            
+
             {/* Protected admin routes */}
-            <Route 
-              path="/admin" 
+            <Route
+              path="/admin"
               element={
                 <RequireAuth>
                   <AdminLayout>
                     <AdminDashboard />
                   </AdminLayout>
                 </RequireAuth>
-              } 
+              }
             />
-            <Route 
-              path="/admin/applications" 
+            <Route
+              path="/admin/applications"
               element={
                 <RequireAuth>
                   <AdminLayout>
                     <Applications />
                   </AdminLayout>
                 </RequireAuth>
-              } 
+              }
             />
-            <Route 
-              path="/admin/loan-criteria" 
+            <Route
+              path="/admin/loan-criteria"
               element={
                 <RequireAuth>
                   <AdminLayout>
                     <LoanCriteria />
                   </AdminLayout>
                 </RequireAuth>
-              } 
+              }
             />
-            <Route 
-              path="/admin/analytics" 
+            <Route
+              path="/admin/analytics"
               element={
                 <RequireAuth>
                   <AdminLayout>
                     <Analytics />
                   </AdminLayout>
                 </RequireAuth>
-              } 
+              }
             />
-            
+            <Route
+              path="/admin/loan-products"
+              element={
+                <RequireAuth>
+                  <AdminLayout>
+                    <LoanProduct />
+                  </AdminLayout>
+                </RequireAuth>
+              }
+            />
             {/* Catch-all route */}
             <Route path="*" element={<NotFound />} />
           </Routes>

@@ -7,6 +7,8 @@ const LoanProductSchema = new mongoose.Schema({
     target_segment: { type: String },
     min_tenure_months: { type: Number, required: true },
     max_tenure_months: { type: Number, required: true },
+    min_amount: { type: Number, required: true },
+    max_amount: { type: Number, required: true },
     interest_rate: { type: Number, required: true },
     processing_fee_percent: { type: Number },
     prepayment_penalty: { type: Number },

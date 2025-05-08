@@ -1,50 +1,82 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
-import { 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardFooter, 
-  CardHeader, 
-  CardTitle 
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
-import { LogIn } from 'lucide-react';
+import { LogIn, Eye, EyeOff } from 'lucide-react';
 
 const Login = () => {
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
 
-    setTimeout(() => {
-      const validPasswords = ['123', '1234', '12345', '123456'];
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
-      if(username === 'admin' && validPasswords.includes(password)) {
+    try {
+      const response = await fetch(`${API_URL}/admin/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Store token and user data
+        localStorage.setItem('token', data.token);
         localStorage.setItem('isLoggedIn', 'true');
+        localStorage.setItem('adminData', JSON.stringify({
+          id: data._id,
+          name: data.name,
+          email: data.email,
+          institute_name: data.institute_name
+        }));
+
         toast({
           title: "Login Successful",
-          description: "Welcome to the admin dashboard!",
+          description: `Welcome back, ${data.name}!`,
         });
-        setIsLoading(false);
+
         navigate('/admin');
       } else {
         toast({
           title: "Login Failed",
-          description: "Invalid username or password.",
+          description: data.message || "Invalid email or password.",
           variant: "destructive"
-        })
-        setIsLoading(false);
-      }                
-    }, 1000);
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Connection error. Please try again later.",
+        variant: "destructive"
+      });
+      console.error("Login error:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
   };
 
   return (
@@ -60,33 +92,46 @@ const Login = () => {
           <form onSubmit={handleSubmit}>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="username">Username</Label>
-                <Input 
-                  id="username"
-                  type="text" 
-                  placeholder="admin" 
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="admin@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   required
                 />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="password">Password</Label>
-                <Input 
-                  id="password"
-                  type="password" 
-                  placeholder="••••••••" 
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
+                <div className="relative">
+                  <Input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="••••••••"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                  />
+                  <button
+                    type="button"
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                    onClick={togglePasswordVisibility}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4 text-gray-500 hover:text-gray-700" />
+                    ) : (
+                      <Eye className="h-4 w-4 text-gray-500 hover:text-gray-700" />
+                    )}
+                  </button>
+                </div>
               </div>
             </CardContent>
             <CardFooter>
-              <Button 
-                type="submit" 
+              <Button
+                type="submit"
                 className="w-full"
-                disabled={isLoading}                
+                disabled={isLoading}
               >
                 {isLoading ? (
                   <span className="flex items-center">
