@@ -22,10 +22,10 @@ A streamlined platform that connects MSMEs with financial organizations for quic
 
 ## Tech Stack
 
-- **Frontend:** React, TypeScript, Tailwind CSS
+- **Frontend:** React, Tailwind CSS
 - **Backend:** Python, Node.js, Express.js
 - **Database:** MongoDB
-- **Icons:** Lucide and radixUI
+- **Icons:** Lucide 
 - **Deployment:** AWS
 
 ---
