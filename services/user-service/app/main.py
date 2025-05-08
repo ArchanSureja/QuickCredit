@@ -18,7 +18,7 @@ URI = os.getenv("MONGO_URI")
 DB_NAME = os.getenv("DB_NAME")
 client = motor.motor_asyncio.AsyncIOMotorClient(URI)
 db = client[DB_NAME]
-user_profiles = db["user_profiles"]
+user_profiles_list = db["user_profiles"]
 bank_analytics = db["bank_analytics"]
 loan_application_list = db["loanapplications"]
 loan_product_list = db["loanproducts"]
@@ -35,7 +35,7 @@ async def get_analytics(analytics_id: str):
 @app.get('/get-profile/{user_id}')
 async def get_profile(user_id: str):
     user_obj_id = ObjectId(user_id)
-    user_profile = await user_profiles.find_one({"_id": user_obj_id},{"_id":0})
+    user_profile = await user_profiles_list.find_one({"_id": user_obj_id},{"_id":0})
     if not user_profile:
         return {"error": "User profile not found"}
     print(user_profile)
@@ -67,6 +67,7 @@ async def add_application(request : Request):
     data = await request.json()
     user_id=ObjectId(data['user_id'])
     loan_product = await loan_product_list.find_one({"name":data["loan_name"]})
+    user_profile = await user_profiles_list.find_one({"_id":user_id})
     loan_product_id= ObjectId(loan_product['_id'])
     current_loan_application = await loan_application_list.find_one({"user_id":user_id,"loan_product_id":loan_product_id})
     if not current_loan_application :
@@ -86,6 +87,8 @@ async def add_application(request : Request):
         loan_application['created'] = datetime.now(timezone.utc)
         loan_application['processed_at'] = datetime.now(timezone.utc)
         loan_application['processed_by'] = loan_product['admin_id']
+        loan_application['name'] = user_profile["name"]
+        loan_application['email'] = user_profile["email"]
         print(loan_application)
         res = await loan_application_list.insert_one(loan_application)
         print(res)

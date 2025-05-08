@@ -44,4 +44,6 @@ export interface LoanApplication {
   updatedAt: string;
   main_matched_rules?: MatchedRules;
   call_tracking_logs?: CallLog[];
+  name : string;
+  email : string;
 }

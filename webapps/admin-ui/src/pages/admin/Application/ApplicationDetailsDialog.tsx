@@ -150,11 +150,11 @@ const CustomerInfo: React.FC<CustomerInfoProps> = ({ application }) => (
         <div className="bg-gray-50 p-4 rounded-md space-y-2">
             <div>
                 <span className="text-sm text-gray-500">Name:</span>
-                <p className="font-medium">{application.user_id?.name || 'N/A'}</p>
+                <p className="font-medium">{application.user_id?.name || application.name || 'N/A'}</p>
             </div>
             <div>
                 <span className="text-sm text-gray-500">Email:</span>
-                <p className="font-medium">{application.user_id?.email || 'N/A'}</p>
+                <p className="font-medium">{application.user_id?.email || application.email || 'N/A'}</p>
             </div>
             <div>
                 <span className="text-sm text-gray-500">Current Status:</span>
@@ -205,7 +205,7 @@ const EligibilityCriteria: React.FC<EligibilityCriteriaProps> = ({ application }
 );
 
 interface CallLogsListProps {
-    logs?: CallLog[];
+    logs?: any[];
 }
 
 const CallLogsList: React.FC<CallLogsListProps> = ({ logs = [] }) => (

@@ -45,7 +45,7 @@ const Index = () => {
           const res_consent : consent = await response.json()
           console.log(res_consent)
           if(res_consent.url){
-            window.open(res_consent.url,"_blank")
+            window.open(res_consent.url,"_self")
           }
           else 
           {
