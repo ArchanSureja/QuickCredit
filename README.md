@@ -22,10 +22,10 @@ A streamlined platform that connects MSMEs with financial organizations for quic
 
 ## Tech Stack
 
-- **Frontend:** React, TypeScript, Tailwind CSS
+- **Frontend:** React, Tailwind CSS
 - **Backend:** Python, Node.js, Express.js
 - **Database:** MongoDB
-- **Icons:** Lucide and radixUI
+- **Icons:** Lucide 
 - **Deployment:** AWS
 
 ---
@@ -74,11 +74,11 @@ cd webapps/msme-user-ui && npm run dev
 
 2. Enter the Mobile number and select your bank account to check your credit score, credit limit, cash flow and stability
 
-3. For other financial analytics, go to Analytics  section 
+3. For other financial analytics, go to Analytics section 
 
 4. To see the Credit offers that matched to your profile, go to Loan Offers section
 
-4. Use the Applications section to view the status of your applications (e.g., Applied, In Review, Disbursed, Rejected) and request changes.
+4. Use the Applications section to view the status of your applications (e.g., Applied, In Review, Disbursed, Rejected).
 
 ---
 
@@ -86,7 +86,7 @@ cd webapps/msme-user-ui && npm run dev
 
 1. Navigate to the admin interface (admin-ui)
 
-2. Use your admin credentials to sign in. (Use follwing credentials, Username: admin, Password: 12345)
+2. Use your admin credentials to sign in. (Use follwing credentials, Username: admin@lender.com, Password: secretpassword123)
 
 3. In dashboard, admin can see Total Applications, Disbursed Loans, Avg. Loan Size, Recent Applications and Loan Performance.
 

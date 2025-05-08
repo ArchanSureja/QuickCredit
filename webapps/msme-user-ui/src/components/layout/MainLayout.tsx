@@ -1,6 +1,6 @@
 
 import { ReactNode } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, Navigate, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { 
   CreditCard, 
@@ -14,6 +14,8 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+
 
 interface MainLayoutProps {
   children: ReactNode;
@@ -22,7 +24,7 @@ interface MainLayoutProps {
 const MainLayout = ({ children }: MainLayoutProps) => {
   const location = useLocation();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
+  const navigate = useNavigate();
   const navigationItems = [
     // { name: "Dashboard", href: "/dashboard", icon: Home },
     { name: "Analytics", href: "/analytics", icon: BarChart3 },
@@ -78,7 +80,9 @@ const MainLayout = ({ children }: MainLayoutProps) => {
           </nav>
 
           <div className="p-4 border-t">
-            <Button 
+            <Button onClick={()=>{
+                navigate("/") 
+              }}
               variant="ghost" 
               className="w-full justify-start text-gray-600 hover:text-finance-primary hover:bg-gray-100"
             >

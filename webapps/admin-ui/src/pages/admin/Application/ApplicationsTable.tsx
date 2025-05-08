@@ -5,10 +5,10 @@ import { formatCurrency } from '@/utils/format';
 import { LoanApplication, ApplicationStatus } from '@/types/application';
 
 interface ApplicationsTableProps {
-  applications: LoanApplication[];
+  applications: any[];
   loading: boolean;
   onViewDetails: (id: string) => void;
-  onUpdateStatus: (id: string, status: ApplicationStatus) => Promise<LoanApplication>;
+  onUpdateStatus: (id: string, status: ApplicationStatus) => Promise<any>;
 }
 
 const ApplicationsTable: React.FC<ApplicationsTableProps> = ({
@@ -52,7 +52,7 @@ const ApplicationsTable: React.FC<ApplicationsTableProps> = ({
           {applications.map((app) => (
             <tr key={app._id} className="border-b border-gray-100 hover:bg-gray-50">
               <td className="py-4 px-4">{app._id.substring(0, 8)}...</td>
-              <td className="py-4 px-4">{app.user_id?.name || 'Unknown'}</td>
+              <td className="py-4 px-4">{app.user_id?.name || app.name || 'Unknown'}</td>
               <td className="py-4 px-4 font-medium">{app.loan_product_id?.name || 'Unknown'}</td>
               <td className="py-4 px-4">{formatCurrency(app.limit)}</td>
               <td className="py-4 px-4">
