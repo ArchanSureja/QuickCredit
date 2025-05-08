@@ -5,12 +5,13 @@ import StatCard from "@/components/analytics/StatCard";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, BarChart3, CreditCard, TrendingUp, Wallet } from "lucide-react";
 import { mockBankAnalytics } from "@/services/mockData";
-import { BankAnalytics } from "@/types/loan";
+import { bank_analytics, BankAnalytics, risk_data } from "@/types/loan";
 import { useNavigate } from "react-router-dom";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 
 const Analytics = () => {
-  const [analytics, setAnalytics] = useState<BankAnalytics | null>(null);
+  const [analytics, setAnalytics] = useState<bank_analytics| null>(null);
+  const [risk_data, setRiskData] = useState<risk_data|null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
@@ -19,10 +20,56 @@ const Analytics = () => {
     const fetchData = async () => {
       setIsLoading(true);
       
-      // Simulate API delay
+
+
+      // step-1 fetch data from the mongodb 
+      const bank_analytics_id = localStorage.getItem("bank_analytics_id")
+      const bank_analytics_res = await fetch(
+        `${import.meta.env.VITE_USER_SERVICE}/get-analytics/${bank_analytics_id}`
+      )
+      const bankAnalytics = await bank_analytics_res.json()
+      // solution 
+      console.log(bankAnalytics)
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      setAnalytics(mockBankAnalytics);
+// Step 1: Get the current month number (0-indexed)
+const currentDate = new Date();
+const currentMonthNumber = currentDate.getMonth();
+
+// Step 2: Define an array of month names in chronological order
+const allMonths = [
+  "January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December"
+];
+
+// Step 3: Sort the monthly_data array
+const sortedMonthlyData = [...bankAnalytics.monthly_data].sort((a, b) => {
+  const monthAIndex = allMonths.indexOf(a.month_name);
+  const monthBIndex = allMonths.indexOf(b.month_name);
+
+  // If month A is the current month, it should come last (return 1)
+  if (monthAIndex === currentMonthNumber) {
+    return 1;
+  }
+  // If month B is the current month, it should come last (return -1)
+  if (monthBIndex === currentMonthNumber) {
+    return -1;
+  }
+  // Otherwise, sort in chronological order
+  return monthAIndex - monthBIndex;
+});
+
+// Step 4: Update the bankAnalytics object with the sorted data
+const updatedBankAnalytics = { ...bankAnalytics, monthly_data: sortedMonthlyData };
+console.log(updatedBankAnalytics);
+      // step-2 fetch credit risk data from the mongodb 
+      const user_id = localStorage.getItem("user_id")
+      const risk_res = await fetch(
+        `${import.meta.env.VITE_CREDIT_SERVICE}/get-risk-data/${user_id}`
+      )
+      const risk_data = await risk_res.json()
+      console.log(risk_data)
+      setRiskData(risk_data)
+      setAnalytics(bankAnalytics);
       setIsLoading(false);
     };
     
@@ -74,27 +121,28 @@ const Analytics = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <StatCard 
             title="Average Monthly Inflow" 
-            value={`₹${analytics.averageMonthlyInflow.toLocaleString()}`} 
+            value={`₹${analytics.average_monthly_inflow.toLocaleString()}`} 
             icon={<TrendingUp className="h-5 w-5 text-finance-primary" />}
-            change={{ value: 5.2, isPositive: true }}
+            // change={{ value: 5.2, isPositive: true }}
           />
           <StatCard 
             title="Average Monthly Outflow" 
-            value={`₹${analytics.averageMonthlyOutflow.toLocaleString()}`}
+            value={`₹${analytics.average_monthly_outflow.toLocaleString()}`}
             icon={<Wallet className="h-5 w-5 text-finance-primary" />}
-            change={{ value: 3.1, isPositive: false }}
+            // change={{ value: 3.1, isPositive: false }}
           />
           <StatCard 
             title="Cash Flow Stability" 
-            value={`${analytics.cashFlowStability}%`}
+            value={`${analytics.cash_flow_stability.toLocaleString()}%`}
             icon={<BarChart3 className="h-5 w-5 text-finance-primary" />}
-            change={{ value: 2.5, isPositive: true }}
+            // change={{ value: 2.5, isPositive: true }}
           />
           <StatCard 
             title="Credit Score" 
-            value={analytics.creditScore.toString()}
+            value={risk_data.credit_score.toString()}
+            // value={10}
             icon={<CreditCard className="h-5 w-5 text-finance-primary" />}
-            change={{ value: 15, isPositive: true }}
+            // change={{ value: 15, isPositive: true }}
           />
         </div>
 
@@ -103,22 +151,22 @@ const Analytics = () => {
             <h3 className="font-medium mb-4">Monthly Cash Flow</h3>
             <div className="h-64">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={analytics.monthlyData}>
+                <LineChart data={analytics.monthly_data}>
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="month" />
+                  <XAxis dataKey="month_name" />
                   <YAxis />
                   <Tooltip formatter={(value) => `₹${value.toLocaleString()}`} />
                   <Legend />
                   <Line 
                     type="monotone" 
-                    dataKey="inflow" 
+                    dataKey="monthly_inflow" 
                     stroke="#0EA5E9" 
                     strokeWidth={2} 
                     name="Inflow"
                   />
                   <Line 
                     type="monotone" 
-                    dataKey="outflow" 
+                    dataKey="monthly_outflow" 
                     stroke="#DC2626" 
                     strokeWidth={2} 
                     name="Outflow"
@@ -132,13 +180,13 @@ const Analytics = () => {
             <h3 className="font-medium mb-4">Monthly Balance</h3>
             <div className="h-64">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={analytics.monthlyData}>
+                <BarChart data={analytics.monthly_data}>
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="month" />
+                  <XAxis dataKey="month_name" />
                   <YAxis />
                   <Tooltip formatter={(value) => `₹${value.toLocaleString()}`} />
                   <Bar 
-                    dataKey="balance" 
+                    dataKey="monthly_balance" 
                     fill="#0369A1" 
                     name="Balance"
                   />
@@ -150,28 +198,29 @@ const Analytics = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <StatCard 
-            title="Min. Maintained Balance" 
-            value={`₹${analytics.minMaintainedBalance.toLocaleString()}`}
+            title="Average Maintained Balance" 
+            value={`₹${analytics.average_maintained_balance.toLocaleString()}`}
           />
           <StatCard 
-            title="Max Debit Amount" 
-            value={`₹${analytics.maxDebitAmount.toLocaleString()}`}
+            title="Total Debited Amount" 
+            value={`₹${analytics.total_debit.toLocaleString()}`}
           />
           <StatCard 
-            title="Max Credit Amount" 
-            value={`₹${analytics.maxCreditAmount.toLocaleString()}`}
+            title="Total Credit Amount" 
+            value={`₹${analytics.total_credit.toLocaleString()}`}
           />
           <StatCard 
-            title="UPI Transactions" 
-            value={analytics.upiTransactionsCount}
+            title="Balance Voltality" 
+            value={`${(analytics.balance_voltality * 100).toLocaleString()} %`}
           />
           <StatCard 
-            title="Monthly Loan Repayments" 
-            value={`₹${analytics.loanRepayments.toLocaleString()}`}
+            title="Cash transaction ratio" 
+            value={`${(analytics.cash_tx_ratio * 100).toLocaleString()} %`}
           />
           <StatCard 
             title="Available Credit Limit" 
-            value={`₹${analytics.creditLimit.toLocaleString()}`}
+            value={`₹${risk_data.credit_limit.toLocaleString()}`}
+            // value={`100000`}
             className="border-2 border-finance-primary/20"
           />
         </div>

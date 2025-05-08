@@ -22,10 +22,10 @@ import {
 import { useToast } from "@/components/ui/use-toast";
 
 const Applications = () => {
-  const [applications, setApplications] = useState<LoanApplication[]>([]);
+  const [applications, setApplications] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [selectedApplication, setSelectedApplication] = useState<LoanApplication | null>(null);
+  const [selectedApplication, setSelectedApplication] = useState<any| null>(null);
   const [loanAmount, setLoanAmount] = useState(0);
   const [loanTenure, setLoanTenure] = useState(0);
   const navigate = useNavigate();
@@ -35,11 +35,18 @@ const Applications = () => {
     // Simulate API fetch
     const fetchApplications = async () => {
       setIsLoading(true);
-      
+      const user_id = localStorage.getItem("user_id")
+      const application_res = await fetch(
+        `${import.meta.env.VITE_USER_SERVICE}/get-applications/${user_id}`
+      )
+      const applications = await application_res.json()
+      console.log(applications) 
+
       // Simulate API delay
+
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      setApplications(mockLoanApplications);
+      setApplications(applications);
       setIsLoading(false);
     };
     
@@ -126,16 +133,16 @@ const Applications = () => {
           <div className="space-y-4">
             {applications.map((app) => (
               <div 
-                key={app.id} 
+                key={app.name} 
                 className="bg-white rounded-lg p-5 shadow-sm border border-gray-100"
               >
                 <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
                   <div>
                     <div className="flex items-center gap-3">
-                      <h3 className="font-semibold text-lg">{app.loanName}</h3>
+                      <h3 className="font-semibold text-lg">{app.name}</h3>
                       <StatusBadge status={app.status} />
                     </div>
-                    <p className="text-sm text-gray-500 mt-1">{app.provider}</p>
+                    <p className="text-sm text-gray-500 mt-1">{app.description}</p>
                     
                     <div className="mt-4 grid grid-cols-2 md:grid-cols-3 gap-x-8 gap-y-2">
                       <div>
@@ -144,24 +151,24 @@ const Applications = () => {
                       </div>
                       <div>
                         <p className="text-xs text-gray-500">Tenure</p>
-                        <p className="font-medium">{app.tenure} {app.tenureUnit}</p>
+                        <p className="font-medium">{app.tenure} Months</p>
                       </div>
                       <div>
                         <p className="text-xs text-gray-500">Interest Rate</p>
-                        <p className="font-medium">{app.interestRate}%</p>
+                        <p className="font-medium">{app.interest_rate}%</p>
                       </div>
                       <div>
                         <p className="text-xs text-gray-500">Applied</p>
-                        <p className="font-medium">{formatDate(app.appliedDate)}</p>
+                        <p className="font-medium">{formatDate(app.applied)}</p>
                       </div>
                       <div>
                         <p className="text-xs text-gray-500">Last Update</p>
-                        <p className="font-medium">{formatDate(app.lastUpdated)}</p>
+                        <p className="font-medium">{formatDate(app.updated)}</p>
                       </div>
                     </div>
                   </div>
                   
-                  <div className="self-start">
+                  {/* <div className="self-start">
                     <Button 
                       variant="outline"
                       onClick={() => openEditModal(app)}
@@ -169,7 +176,7 @@ const Applications = () => {
                     >
                       Request Changes
                     </Button>
-                  </div>
+                  </div> */}
                 </div>
               </div>
             ))}

@@ -10,7 +10,7 @@ import Analytics from "./pages/Analytics";
 import Offers from "./pages/Offers";
 import Applications from "./pages/Applications";
 import NotFound from "./pages/NotFound";
-
+import Profile from "./pages/Profile";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -21,10 +21,11 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
-          <Route path="/dashboard" element={<Dashboard />} />
+          {/* <Route path="/dashboard" element={<Dashboard />} /> */}
           <Route path="/analytics" element={<Analytics />} />
           <Route path="/offers" element={<Offers />} />
           <Route path="/applications" element={<Applications />} />
+          <Route path="/profile" element={<Profile/>} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

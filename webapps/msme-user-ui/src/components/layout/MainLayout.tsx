@@ -24,7 +24,7 @@ const MainLayout = ({ children }: MainLayoutProps) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const navigationItems = [
-    { name: "Dashboard", href: "/dashboard", icon: Home },
+    // { name: "Dashboard", href: "/dashboard", icon: Home },
     { name: "Analytics", href: "/analytics", icon: BarChart3 },
     { name: "Loan Offers", href: "/offers", icon: CreditCard },
     { name: "Applications", href: "/applications", icon: FileText },

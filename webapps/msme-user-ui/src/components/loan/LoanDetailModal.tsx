@@ -16,8 +16,8 @@ import { Check } from "lucide-react";
 interface LoanDetailModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onApply: (loanId: string) => void;
-  loanId: string | null;
+  onApply: (loanName: string) => void;
+  loanName: string | null;
   loans: LoanOffer[];
 }
 
@@ -25,19 +25,19 @@ const LoanDetailModal = ({
   isOpen,
   onClose,
   onApply,
-  loanId,
+  loanName,
   loans
 }: LoanDetailModalProps) => {
-  const [loan, setLoan] = useState<LoanOffer | null>(null);
+  const [loan, setLoan] = useState<any | null>(null);
   
   useEffect(() => {
-    if (loanId) {
-      const selectedLoan = loans.find(l => l.id === loanId) || null;
+    if (loanName) {
+      const selectedLoan = loans.find(l => l.name === loanName) || null;
       setLoan(selectedLoan);
     } else {
       setLoan(null);
     }
-  }, [loanId, loans]);
+  }, [loanName, loans]);
 
   if (!loan) return null;
 
@@ -46,33 +46,33 @@ const LoanDetailModal = ({
       <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{loan.name}</DialogTitle>
-          <DialogDescription>{loan.provider}</DialogDescription>
+          <DialogDescription>{loan.description}</DialogDescription>
         </DialogHeader>
         
         <div className="grid grid-cols-2 gap-6 py-4">
           <div className="space-y-1">
             <p className="text-sm text-gray-500">Loan Amount</p>
-            <p className="font-medium">₹{loan.minAmount.toLocaleString()} - ₹{loan.maxAmount.toLocaleString()}</p>
+            <p className="font-medium">₹{loan.min_amount.toLocaleString()} - ₹{loan.max_amount.toLocaleString()}</p>
           </div>
           <div className="space-y-1">
             <p className="text-sm text-gray-500">Interest Rate</p>
-            <p className="font-medium">{loan.interestRate}% p.a.</p>
+            <p className="font-medium">{loan.interest_rate}% p.a.</p>
           </div>
           <div className="space-y-1">
             <p className="text-sm text-gray-500">Tenure</p>
-            <p className="font-medium">{loan.minTenure} - {loan.maxTenure} {loan.tenureUnit}</p>
+            <p className="font-medium">{loan.min_tenure_months} - {loan.max_tenure_months} Months</p>
           </div>
-          <div className="space-y-1">
+          {/* <div className="space-y-1">
             <p className="text-sm text-gray-500">Disbursement Time</p>
             <p className="font-medium">{loan.disbursementTime}</p>
-          </div>
+          </div> */}
           <div className="space-y-1">
             <p className="text-sm text-gray-500">Processing Fee</p>
-            <p className="font-medium">{loan.processingFee}</p>
+            <p className="font-medium">{loan.processing_fee_percent} %</p>
           </div>
           <div className="space-y-1">
             <p className="text-sm text-gray-500">Prepayment Penalty</p>
-            <p className="font-medium">{loan.prepaymentPenalty}</p>
+            <p className="font-medium">{loan.prepayment_penalty} %</p>
           </div>
         </div>
         
@@ -83,11 +83,11 @@ const LoanDetailModal = ({
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1">
               <p className="text-sm text-gray-500">Frequency</p>
-              <p className="font-medium">{loan.repaymentFrequency}</p>
+              <p className="font-medium">{loan.prepayment_frequency}</p>
             </div>
             <div className="space-y-1">
               <p className="text-sm text-gray-500">Method</p>
-              <p className="font-medium">{loan.repaymentMethod}</p>
+              <p className="font-medium">Auto-Debit From Bank account</p>
             </div>
           </div>
         </div>
@@ -97,7 +97,7 @@ const LoanDetailModal = ({
         <div className="py-4">
           <h4 className="text-sm font-medium mb-3">Required Documents</h4>
           <ul className="space-y-2">
-            {loan.requiredDocuments.map((doc, index) => (
+            {loan.required_documents.map((doc, index) => (
               <li key={index} className="flex items-center">
                 <Check size={16} className="text-finance-success mr-2" />
                 <span className="text-sm">{doc}</span>
@@ -108,7 +108,7 @@ const LoanDetailModal = ({
         
         <Separator />
         
-        <div className="py-4">
+        {/* <div className="py-4">
           <h4 className="text-sm font-medium mb-3">Eligibility Criteria</h4>
           <ul className="space-y-2">
             {loan.eligibilityCriteria.map((criteria, index) => (
@@ -118,7 +118,7 @@ const LoanDetailModal = ({
               </li>
             ))}
           </ul>
-        </div>
+        </div> */}
         
         <DialogFooter>
           <Button variant="outline" onClick={onClose}>Cancel</Button>

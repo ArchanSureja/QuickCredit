@@ -7,11 +7,12 @@ import LoanDetailModal from "@/components/loan/LoanDetailModal";
 import { mockLoanOffers } from "@/services/mockData";
 import { LoanOffer } from "@/types/loan";
 import { useToast } from "@/components/ui/use-toast";
+import { AnyARecord } from "dns";
 
 const Offers = () => {
-  const [offers, setOffers] = useState<LoanOffer[]>([]);
+  const [offers, setOffers] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedLoanId, setSelectedLoanId] = useState<string | null>(null);
+  const [selectedLoanName, setSelectedLoanName] = useState<string | null>(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -22,22 +23,46 @@ const Offers = () => {
       setIsLoading(true);
       
       // Simulate API delay
+      const user_id = localStorage.getItem("user_id")
+      const offer_res = await fetch(
+        `${import.meta.env.VITE_LOAN_OFFER_SERVICE}/get-matched-offers/${user_id}`
+      )
+      const offers = await offer_res.json()
+      console.log(offers)
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      setOffers(mockLoanOffers);
+      setOffers(offers);
       setIsLoading(false);
     };
     
     fetchOffers();
   }, []);
 
-  const handleViewDetails = (loanId: string) => {
-    setSelectedLoanId(loanId);
+  const handleViewDetails = (loanName: string) => {
+    setSelectedLoanName(loanName);
     setIsDetailsModalOpen(true);
   };
 
-  const handleApplyForLoan = (loanId: string) => {
+  const handleApplyForLoan = async (loanName: string) => {
     // Create a new application
+    const user_id = localStorage.getItem("user_id")
+    const  loan_name = loanName
+    const payload = {
+        "user_id":user_id,
+        "loan_name":loan_name
+    }
+    const application_res = await fetch(
+      `${import.meta.env.VITE_USER_SERVICE}/add-application`,{
+        method : "POST",
+        headers: {
+          "Content-Type": "application/json"
+      },
+      body: JSON.stringify(payload)
+      }
+      
+    )
+    const application = await application_res.json()
+    console.log(application)
     toast({
       title: "Application Created",
       description: "Your loan application has been successfully created.",
@@ -49,7 +74,7 @@ const Offers = () => {
 
   const handleCloseDetailsModal = () => {
     setIsDetailsModalOpen(false);
-    setSelectedLoanId(null);
+    setSelectedLoanName(null);
   };
 
   return (
@@ -73,7 +98,7 @@ const Offers = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {offers.map((loan) => (
               <LoanCard
-                key={loan.id}
+                key={loan.name}
                 loan={loan}
                 onViewDetails={handleViewDetails}
                 onApply={handleApplyForLoan}
@@ -92,7 +117,7 @@ const Offers = () => {
           isOpen={isDetailsModalOpen}
           onClose={handleCloseDetailsModal}
           onApply={handleApplyForLoan}
-          loanId={selectedLoanId}
+          loanName={selectedLoanName}
           loans={offers}
         />
       </div>

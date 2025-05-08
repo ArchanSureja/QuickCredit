@@ -12,7 +12,7 @@ const Index = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!mobileNumber || mobileNumber.length !== 10) {
@@ -25,7 +25,66 @@ const Index = () => {
     }
 
     setIsLoading(true);
-    
+          // step-1 create consent 
+
+          // consent response type 
+          interface consent {
+              id : string,
+              url : string
+          }
+
+          const response = await fetch(`${import.meta.env.VITE_AA_SERVICE}/create-consent`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              "phone": mobileNumber
+            }),
+          });
+          const res_consent : consent = await response.json()
+          console.log(res_consent)
+          if(res_consent.url){
+            window.open(res_consent.url,"_blank")
+          }
+          else 
+          {
+            console.log("URL not Found")
+          }
+          // step-2 poll consent status 
+          async function startPolling() {
+            while(true)
+            {
+              const poll_res = await fetch(
+                `${import.meta.env.VITE_AA_SERVICE}/get-consent-status/${res_consent.id}`)
+              const res_poll = await poll_res.json()
+              console.log(res_poll)
+              if(res_poll.status=="ACTIVE")
+              {
+                break;
+              }
+              await new Promise(resolve => setTimeout(resolve, 3000));
+            }
+          }
+          await startPolling();
+          
+          console.log("Polling completed...")
+          // step-3 if status==approved create session 
+          const session_create_res = await fetch(
+            `${import.meta.env.VITE_AA_SERVICE}/create-session/${res_consent.id}`
+          )
+          const session_res = await session_create_res.json()
+          console.log(session_res)
+          // step-4 init fetch data
+          console.log("time delay started....")
+          await new Promise(resolve => setTimeout(resolve, 10000));
+          const FI_msg = await fetch(
+            `${import.meta.env.VITE_AA_SERVICE}/fetch-data/${session_res.id}`
+          )
+          const res = await FI_msg.json()
+
+          localStorage.setItem("user_id",res.ids.user_id)
+          localStorage.setItem("bank_analytics_id",res.ids.bank_analytics_id)
     // Simulate API call for authentication
     setTimeout(() => {
       setIsLoading(false);
