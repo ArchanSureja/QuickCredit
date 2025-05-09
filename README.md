@@ -119,14 +119,6 @@ npm run start
 
 6. For details insights like monthly application trends and loan product Performance, platform provides analytics dashboard.
 
-## Deployment
-
-The applications can be accessed at the following URLs:
-
-- **MSME User App**: [https://msme.quickcredit.com](https://msme.quickcredit.com)
-- **Admin Dashboard**: [https://admin.quickcredit.com](https://admin.quickcredit.com)
-
-
 
 
 
