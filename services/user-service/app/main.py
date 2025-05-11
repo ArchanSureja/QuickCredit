@@ -97,6 +97,7 @@ async def get_applications(user_id: str):
 async def add_application(request: Request):
     data = await request.json()
     user_id=ObjectId(data['user_id'])
+    user_profile = await user_profiles_list.find_one({"_id":user_id})
     loan_product = await loan_product_list.find_one({"name":data["loan_name"]})
     loan_product_id= ObjectId(loan_product['_id'])
     current_loan_application = await loan_application_list.find_one({"user_id":user_id,"loan_product_id":loan_product_id})
@@ -128,9 +129,7 @@ async def add_application(request: Request):
         admin_email = admin.get('email', ADMIN_EMAIL)
         admin_name = admin.get('name', 'Admin')
         
-        # Get user details
-        user = await user_profiles.find_one({"_id": user_id})
-        user_name = user.get('name', 'Customer')
+        user_name = user_profile.get('name', 'Customer')
         
         # Prepare email
         subject = f"New Loan Application Received - {loan_product['name']}"
