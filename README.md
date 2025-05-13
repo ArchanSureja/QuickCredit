@@ -63,7 +63,28 @@ cd webapps/admin-ui && npm run dev
 cd webapps/msme-user-ui && npm run dev
 
 ```
+### 5. Backend Services Setup:
+```bash
+#Terminal 1 - aa-service
+docker build -t aa-service .
+docker run --name test-aa-service -d -p 8000:8000 aa-service
 
+#Terminal 2 - user-service
+docker build -t user-service .
+docker run --name test-user-service -d -p 8001:8001 user-service
+
+#Terminal 3 - credit-engine
+docker build -t credit-engine .
+docker run --name test-credit-engine -d -p 8002:8002 credit-engine
+
+#Terminal 4 - loan-matching
+docker build -t loan-matching
+docker run --name test-loan-matching -d -p 8003:8003 loan-matching
+
+#Terminal 5 - admin service(nodejs service)
+npm install
+npm run start 
+```
 ---
 
 ## How to Use
@@ -97,14 +118,6 @@ cd webapps/msme-user-ui && npm run dev
 5. In the Loan Criteria section, the admin can add new loan criteria, edit existing ones, and toggle their active/inactive status.
 
 6. For details insights like monthly application trends and loan product Performance, platform provides analytics dashboard.
-
-## Deployment
-
-The applications can be accessed at the following URLs:
-
-- **MSME User App**: [https://msme.quickcredit.com](https://msme.quickcredit.com)
-- **Admin Dashboard**: [https://admin.quickcredit.com](https://admin.quickcredit.com)
-
 
 
 
